@@ -1,18 +1,18 @@
 # Weather predictor - A tool to forecast the weather using machine learning and distributed computing
 
-##Introduction
+## Introduction
 
 Weather forecast systems are among the most complex equations that computer has to solve. Bigdata has the potential to
 transform the way we can understand and predict weather systems using distributed computing capabilities. This project aims to solve
 this using machine learning algorithms and big data frameworks like spark.
 
-##Problem Statement
+## Problem Statement
 
 Create a toy model of the environment (taking into account things like atmosphere, topography, geography, oceanography, or similar) that evolves over time. Then take measurements at various locations (ie weather stations), and then have the program emit that data, as in the following:
 
 SYD|-33.86,151.21,39|2015-12-23T05:02:12Z|Rain|+12.5|1004.3|97
 
-##Pre-requisites
+## Pre-requisites
 
 Apache maven
 
@@ -23,7 +23,7 @@ Spark 2.2
 sparkts(spark cloudera time series library)
 
 
-##Forecasting 
+## Forecasting 
 
 The model is built upon historic data to forecast temperature , humidity , pressure and weather condition.As the 
 weather observations are over a period of time, time-series 
@@ -49,7 +49,7 @@ ARIMA methodology does have its limitations. These models directly rely on past 
 Also it is best suited for short term predictions.
 
 
-##Project
+## Project
 
 The application is driven by a config file in the resources folder 
 application.conf. It accepts the following parameters.
@@ -68,15 +68,15 @@ output.path-
 
 
 
-##Build
+## Build
 
 This project is built using Apache Maven. To build this run:
 
 build/mvn -DskipTests clean package
 
-##Execution
+## Execution
 
 
 
 
-##Files and Folders
+## Files and Folders
