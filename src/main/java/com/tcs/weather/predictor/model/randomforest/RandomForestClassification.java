@@ -20,10 +20,10 @@ import org.slf4j.LoggerFactory;
  *
  * Created by vishnuvr on 15/10/2017.
  */
-public class RandomForestTimeSeriesModel implements ClassificationModel {
+public class RandomForestClassification implements ClassificationModel {
 
 
-    private static final Logger logger = LoggerFactory.getLogger(RandomForestTimeSeriesModel.class);
+    private static final Logger logger = LoggerFactory.getLogger(RandomForestClassification.class);
 
 
     private String impurity;
