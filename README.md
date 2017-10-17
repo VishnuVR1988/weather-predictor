@@ -1,4 +1,4 @@
-#Weather predictor - A tool to forecast the weather using machine learning and distributed computing
+# Weather predictor - A tool to forecast the weather using machine learning and distributed computing
 
 ##Introduction
 
