@@ -15,7 +15,7 @@ bin
 conf
 doc
 lib
-src/test
+src/wip
 target
 !src/test/java/com/tcs/weather/predictor/support/SparkUtilsTest.java
 !src/test/java/com/tcs/weather/predictor/support/GeoUtilsTest.java
