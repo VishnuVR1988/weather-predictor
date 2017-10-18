@@ -1,12 +1,12 @@
 package com.tcs.weather;
 
+import com.tcs.weather.predictor.dto.Geocode;
 import com.tcs.weather.predictor.model.ClassificationModel;
 import com.tcs.weather.predictor.exception.WeatherPredictionException;
 import com.tcs.weather.predictor.model.arima.ArimaTimeSeriesModel;
-import com.tcs.weather.predictor.model.randomforest.RandomForestTimeSeriesModel;
-import org.apache.spark.api.java.JavaPairRDD;
+import com.tcs.weather.predictor.model.randomforest.RandomForestClassification;
+import com.tcs.weather.predictor.support.GeoUtils;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.*;
 
 import static org.apache.spark.sql.functions.lit;
@@ -20,7 +20,8 @@ import com.tcs.weather.predictor.dto.WeatherDTO;
 import com.tcs.weather.predictor.constants.Constants;
 import com.tcs.weather.predictor.support.ServiceConfig;
 import com.tcs.weather.predictor.support.SparkUtils;
-import scala.Tuple2;
+
+import java.io.IOException;
 
 
 /**
@@ -47,17 +48,18 @@ import scala.Tuple2;
  * Once dataset is loaded it uses spark-timeseries library for predicting temperature, pressure and humidity.
  * See {@linktourl https://github.com/sryza/spark-timeseries}
  *
- * @author Vishnu
- * @version 1.0.0
- * @since 1.0.0
  * @see ArimaTimeSeriesModel
  * </p>
  * <p>
  * <p>
  * <p>
  * Weather condition is classified according to predicted temperature, pressure and humidity values.
- * @see RandomForestTimeSeriesModel
+ * @see RandomForestClassification
  * </p>
+ *
+ * @author Vishnu
+ * @version 1.0.0
+ * @since 1.0.0
  */
 
 public class Main {
@@ -80,7 +82,7 @@ public class Main {
         }
     }
 
-    private static void run ( int limit ) throws WeatherPredictionException {
+    private static void run ( int limit ) throws WeatherPredictionException,IOException {
 
         logger.info("Parsing application.conf file.");
         //Load the application config file from resources
@@ -123,7 +125,7 @@ public class Main {
         TimeSeriesModel tempTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.TEMPERATURE);
         TimeSeriesModel pressureTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.PRESSURE);
         TimeSeriesModel humidityTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.HUMIDITY);
-        ClassificationModel conditionClassificationModel = ModelLoader.loadModel(new RandomForestTimeSeriesModel(), Constants.CONDITION);
+        ClassificationModel conditionClassificationModel = ModelLoader.loadModel(new RandomForestClassification(), Constants.CONDITION);
 
         logger.info("TimeSeriesModel creation completed.Starting regression ....");
 
@@ -147,10 +149,17 @@ public class Main {
         //Enrich the datasets by adding location information and sort by date.
         //This is loaded to WeatherDTO class.
 
+        Geocode geocode = GeoUtils.getLatLongAlt("sydney");
+
+        logger.debug("latitude is "+geocode.getLatitude());
+        logger.debug("longitude is "+geocode.getLongitude());
+        logger.debug("altitude is "+geocode.getAltitude());
+
+
         Dataset <WeatherDTO> finalDS = predictedDSWithCondition.
-                withColumn("latitude", lit(12.67))
-                .withColumn("longitude", lit(12.67))
-                .withColumn("altitude", lit(12.67)).orderBy("date")
+                withColumn("latitude", lit(geocode.getLatitude()))
+                .withColumn("longitude", lit(geocode.getLongitude()))
+                .withColumn("altitude", lit(geocode.getAltitude())).orderBy("date")
                 .as(Encoders.bean(WeatherDTO.class));
 
         //Preview of output is displayed.
@@ -167,6 +176,8 @@ public class Main {
         if (isSaved) {
             logger.info("Dataset output successfully written to folder {}", config.output.path);
         }
+
+        spark.stop();
 
     }
 

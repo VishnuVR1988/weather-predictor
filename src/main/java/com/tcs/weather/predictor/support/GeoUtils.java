@@ -49,7 +49,7 @@ public class GeoUtils {
      * @return lat-long array
      * @throws IOException
      */
-    private static double[] getLatLngForAddr ( final String stationName ) throws IOException {
+    public static double[] getLatLngForAddr ( final String stationName ) throws IOException {
         if (stationName == null) return ArrayUtils.EMPTY_DOUBLE_ARRAY;
         logger.debug(" LatLng Address is {}", stationName);
         final Geocoder geocoder = new Geocoder();
@@ -67,6 +67,8 @@ public class GeoUtils {
             LatLng ll = geocoderResult.getGeometry().getLocation();
             loc[0] = ll.getLat().doubleValue();
             loc[1] = ll.getLng().doubleValue();
+            logger.debug(" Latitude is {}", loc[0]);
+            logger.debug(" Longitude is {}", loc[1]);
             return loc;
 
         }
@@ -118,7 +120,7 @@ public class GeoUtils {
      * @param url
      * @return
      */
-    private static String sendGetRequest ( final String url ) {
+    protected static String sendGetRequest ( final String url ) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault();) {
             HttpGet request = new HttpGet(url);
             try (CloseableHttpResponse response = httpClient.execute(request)) {
@@ -141,7 +143,7 @@ public class GeoUtils {
 
     public static Geocode getLatLongAlt ( final String stationName ) throws IOException {
 
-        final double[] latLngForAddr = getLatLngForAddr(stationName);
+        double[] latLngForAddr = getLatLngForAddr(stationName);
         double altitude = Double.NaN;
 
         if (ArrayUtils.isNotEmpty(latLngForAddr)) {
@@ -151,7 +153,7 @@ public class GeoUtils {
         Geocode geocode = new Geocode();
         geocode.setAltitude(altitude);
         geocode.setLatitude(latLngForAddr[0]);
-        geocode.setLatitude(latLngForAddr[1]);
+        geocode.setLongitude(latLngForAddr[1]);
         return geocode;
     }
 

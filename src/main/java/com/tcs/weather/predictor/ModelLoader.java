@@ -3,7 +3,7 @@ package com.tcs.weather.predictor;
 import com.tcs.weather.predictor.model.ClassificationModel;
 import com.tcs.weather.predictor.model.TimeSeriesModel;
 import com.tcs.weather.predictor.model.arima.ArimaTimeSeriesModel;
-import com.tcs.weather.predictor.model.randomforest.RandomForestTimeSeriesModel;
+import com.tcs.weather.predictor.model.randomforest.RandomForestClassification;
 import com.tcs.weather.predictor.constants.Constants;
 import com.tcs.weather.predictor.constants.MLConstants;
 
@@ -43,7 +43,7 @@ public class ModelLoader {
         return arimaModel;
     }
 
-    public static ClassificationModel loadModel ( RandomForestTimeSeriesModel randomForestModel, String variable) {
+    public static ClassificationModel loadModel ( RandomForestClassification randomForestModel, String variable) {
         switch (variable) {
             case (Constants.CONDITION):
                 applyClassificationParams(randomForestModel, variable);
@@ -52,7 +52,7 @@ public class ModelLoader {
         return randomForestModel;
     }
 
-    private static void applyClassificationParams ( RandomForestTimeSeriesModel randomForestModel, String variable ) {
+    private static void applyClassificationParams ( RandomForestClassification randomForestModel, String variable ) {
         randomForestModel.setImpurity(MLConstants.IMPURITY);
         randomForestModel.setFeatureSubsetStrategy(MLConstants.FEATURE_SUBSET_STRATEGY);
         randomForestModel.setMaxDepth(MLConstants.MAX_DEPTH);

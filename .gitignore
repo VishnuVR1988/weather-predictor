@@ -17,6 +17,9 @@ doc
 lib
 src/test
 target
+!src/test/java/com/tcs/weather/predictor/support/SparkUtilsTest.java
+!src/test/java/com/tcs/weather/predictor/support/GeoUtilsTest.java
+
 
 # OS generated files #
 ######################

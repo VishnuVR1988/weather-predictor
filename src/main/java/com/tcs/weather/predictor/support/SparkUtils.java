@@ -52,8 +52,8 @@ public class SparkUtils {
     }
 
 
-    public static boolean saveDataFrameAsCSV ( Dataset df, String filePath ) {
-        df.coalesce(1).write()
+    public static boolean saveDataFrameAsCSV ( Dataset ds, String filePath ) {
+        ds.coalesce(1).write().format("text")
                     .save(filePath);
         return true;
     }
