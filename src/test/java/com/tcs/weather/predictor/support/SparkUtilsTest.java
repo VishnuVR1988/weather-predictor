@@ -2,11 +2,14 @@ package com.tcs.weather.predictor.support;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructType;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,35 +31,35 @@ public class SparkUtilsTest {
 
     @Before
     public void setUp () throws Exception {
-         config = ServiceConfig.getConfig();
-         spark = SparkUtils.createSparkContext(config.spark);
+        config = ServiceConfig.getConfig();
+        spark = SparkUtils.createSparkContext(config.spark);
 
     }
 
     @Test
-    public void testCreateSparkContext(){
+    public void testCreateSparkContext () {
         assertNotNull(spark);
     }
 
     @Test
-    public void testCreateSparkContextMaster(){
-        assertEquals("local[4]",config.spark.master);
+    public void testCreateSparkContextMaster () {
+        assertEquals("local[4]", config.spark.master);
     }
 
     @Test
-    public void testCreateSparkContextAppName(){
-        assertEquals("Toy Weather Predictor",config.spark.appName);
-    }
-
-
-    @Test
-    public void testLoadDataSet(){
-    assertNotNull(SparkUtils.loadDataSet(spark,config.input));
+    public void testCreateSparkContextAppName () {
+        assertEquals("Toy Weather Predictor", config.spark.appName);
     }
 
 
     @Test
-    public void testLoadDataSetSchema(){
+    public void testLoadDataSet () {
+        assertNotNull(SparkUtils.loadDataSet(spark, config.input));
+    }
+
+
+    @Test
+    public void testLoadDataSetSchema () {
         Dataset <Row> rowDataset = SparkUtils.loadDataSet(spark, config.input);
         StructType expectedSchema = DataTypes.createStructType(Arrays.asList(
                 DataTypes.createStructField("station", DataTypes.StringType, true),
@@ -66,10 +69,22 @@ public class SparkUtilsTest {
                 DataTypes.createStructField("pressure", DataTypes.DoubleType, true),
                 DataTypes.createStructField("condition", DataTypes.StringType, true)
         ));
-        assertEquals("Schema is not matching",expectedSchema,rowDataset.schema());
+        assertEquals("Schema is not matching", expectedSchema, rowDataset.schema());
     }
 
 
+    @Test
+    public void testSaveDataSet () {
+        Dataset <Row> rowDataset = SparkUtils.loadDataSet(spark, config.input);
+        assertTrue(SparkUtils.saveDataSet(rowDataset.map((MapFunction <Row, String>) row
+                -> row.mkString(), Encoders.STRING()), config.output.path));
+    }
+
+    @After
+    public void tearDown () throws Exception {
+        spark.stop();
+
+    }
 
 
 }

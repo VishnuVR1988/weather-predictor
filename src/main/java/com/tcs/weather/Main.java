@@ -171,7 +171,7 @@ public class Main {
                 Encoders.STRING());
 
         //Save to output folder
-        final boolean isSaved = SparkUtils.saveDataFrameAsCSV(finalDSStr, config.output.path);
+        final boolean isSaved = SparkUtils.saveDataSet(finalDSStr, config.output.path);
 
         if (isSaved) {
             logger.info("Dataset output successfully written to folder {}", config.output.path);
