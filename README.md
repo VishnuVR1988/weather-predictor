@@ -64,7 +64,7 @@ output.path- Path to save the output.
 
 The historical weather details are downloaded from Bureau of Meteorology, Australia website.
  
-The input for two stations Sydney and Melbourne (2 months data) are available under src/main/resources
+The input data for two stations, Sydney and Melbourne (2 months data) are available under src/main/resources
 More number for stations can be added by providing historical values in the below format 
 under input directory.
 
@@ -99,13 +99,13 @@ This can be run using the script under bin folder.
 
 Input files
 
-![sydney][https://github.com/VishnuVR1988/weather-predictor/tree/master/src/main/java/resources/input/sydney.csv]
+ [sydney.csv][https://github.com/VishnuVR1988/weather-predictor/tree/master/src/main/java/resources/input/sydney.csv]
 
-![melbourne][https://github.com/VishnuVR1988/weather-predictor/tree/master/src/main/java/resources/input/melbourne.csv]
+ [melbourne.csv][https://github.com/VishnuVR1988/weather-predictor/tree/master/src/main/java/resources/input/melbourne.csv]
 
-![application.conf] [https://github.com/VishnuVR1988/weather-predictor/tree/master/src/conf/application.conf]
+ [application.conf] [https://github.com/VishnuVR1988/weather-predictor/tree/master/src/conf/application.conf]
 
-![run_weather-predictor.sh][https://github.com/VishnuVR1988/weather-predictor/tree/master/bin/run_weather-predictor.sh]
+ [run_weather-predictor.sh][https://github.com/VishnuVR1988/weather-predictor/tree/master/bin/run_weather-predictor.sh]
 
 
 

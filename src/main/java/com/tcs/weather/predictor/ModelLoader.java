@@ -25,9 +25,10 @@ public class ModelLoader {
      *
      * @param arimaModel
      * @param variable
+     * @param station
      * @return
      */
-    public static TimeSeriesModel loadModel ( ArimaTimeSeriesModel arimaModel, String variable) {
+    public static TimeSeriesModel loadModel ( ArimaTimeSeriesModel arimaModel, String variable,String station) {
 
         switch (variable) {
             case (Constants.HUMIDITY): {
@@ -35,6 +36,7 @@ public class ModelLoader {
                 arimaModel.setQ(MLConstants.Q_HUMIDITY);
                 arimaModel.setD(MLConstants.D_HUMIDITY);
                 arimaModel.setVariable(variable);
+                arimaModel.setStation(station);
                 break;
             }
 
@@ -43,6 +45,7 @@ public class ModelLoader {
                 arimaModel.setQ(MLConstants.Q_PRESSURE);
                 arimaModel.setD(MLConstants.D_PRESSURE);
                 arimaModel.setVariable(variable);
+                arimaModel.setStation(station);
                 break;
             }
 
@@ -51,6 +54,7 @@ public class ModelLoader {
                 arimaModel.setQ(MLConstants.Q_TEMPERATURE);
                 arimaModel.setD(MLConstants.D_TEMPERATURE);
                 arimaModel.setVariable(variable);
+                arimaModel.setStation(station);
                 break;
             }
             default:
@@ -65,12 +69,13 @@ public class ModelLoader {
      *
      * @param randomForestModel
      * @param variable
+     * @param station
      * @return
      */
-    public static ClassificationModel loadModel ( RandomForestClassification randomForestModel, String variable) {
+    public static ClassificationModel loadModel ( RandomForestClassification randomForestModel, String variable,String station) {
         switch (variable) {
             case (Constants.CONDITION):
-                applyClassificationParams(randomForestModel, variable);
+                applyClassificationParams(randomForestModel, variable,station);
                 break;
             default:
                 logger.error("Invalid parameter");
@@ -84,13 +89,15 @@ public class ModelLoader {
      *
      * @param randomForestModel
      * @param variable
+     * @param station
      */
-    private static void applyClassificationParams ( RandomForestClassification randomForestModel, String variable ) {
+    private static void applyClassificationParams ( RandomForestClassification randomForestModel, String variable,String station) {
         randomForestModel.setImpurity(MLConstants.IMPURITY);
         randomForestModel.setFeatureSubsetStrategy(MLConstants.FEATURE_SUBSET_STRATEGY);
         randomForestModel.setMaxDepth(MLConstants.MAX_DEPTH);
         randomForestModel.setNumTrees(MLConstants.NUM_TREES);
         randomForestModel.setVariable(variable);
+        randomForestModel.setStation(station);
         return;
     }
 

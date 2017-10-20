@@ -28,12 +28,13 @@ import com.tcs.weather.predictor.constants.Constants;
 
 /**
  * This class is the implementation of arima based forecast algorithm
+ *
  * @author Vishnu
- * @since 1.0.0
  * @version 1.0.0
+ * @since 1.0.0
  */
 
-public class ArimaTimeSeriesModel implements TimeSeriesModel,Serializable {
+public class ArimaTimeSeriesModel implements TimeSeriesModel, Serializable {
 
 
     private static final Logger logger = LoggerFactory.getLogger(ArimaTimeSeriesModel.class);
@@ -62,6 +63,8 @@ public class ArimaTimeSeriesModel implements TimeSeriesModel,Serializable {
     private String variable;
 
 
+    private String station;
+
     public static final double ALPHA = 1 - Math.exp(-0.30103 / 4.0);
 
 
@@ -87,6 +90,14 @@ public class ArimaTimeSeriesModel implements TimeSeriesModel,Serializable {
         this.q = q;
     }
 
+
+    public String getStation () {
+        return station;
+    }
+
+    public void setStation ( String station ) {
+        this.station = station;
+    }
 
     /**
      * Retrieve the last n elements of a vector

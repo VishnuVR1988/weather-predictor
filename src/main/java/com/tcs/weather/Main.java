@@ -104,10 +104,12 @@ public class Main {
             //Create the model objects
             logger.info("Loading  the model objects for predicting values.");
 
-            TimeSeriesModel tempTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.TEMPERATURE);
-            TimeSeriesModel pressureTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.PRESSURE);
-            TimeSeriesModel humidityTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.HUMIDITY);
-            ClassificationModel conditionClassificationModel = ModelLoader.loadModel(new RandomForestClassification(), Constants.CONDITION);
+            String station = FilenameUtils.getBaseName(file);
+
+            TimeSeriesModel tempTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.TEMPERATURE, station);
+            TimeSeriesModel pressureTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.PRESSURE, station);
+            TimeSeriesModel humidityTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.HUMIDITY, station);
+            ClassificationModel conditionClassificationModel = ModelLoader.loadModel(new RandomForestClassification(), Constants.CONDITION, station);
 
             //Do the auto arima regression for temperature
             Dataset <Row> tempForecast = tempTimeSeriesModel.pointForecast(inputData, sparkSession, limit);
@@ -130,7 +132,7 @@ public class Main {
             //Enrich the datasets by adding location information and sort by date.
             //This is loaded to WeatherDTO class.
 
-            Geocode geocode = GeoUtils.getLatLongAlt(FilenameUtils.getBaseName(file));
+            Geocode geocode = GeoUtils.getLatLongAlt(station);
 
             Dataset <Row> finalDS = SparkUtils.enrichWithGeoPoints(predictedDSWithCondition, geocode);
 
