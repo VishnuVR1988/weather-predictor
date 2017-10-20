@@ -10,7 +10,7 @@ this using machine learning algorithms and big data frameworks like spark.
 
 Create a toy model of the environment (taking into account things like atmosphere, topography, geography, oceanography, or similar) that evolves over time. Then take measurements at various locations (ie weather stations), and then have the program emit that data, as in the following:
 
-SYDNEY|-33.86,151.21,39|2015-12-23T05:02:12Z|Rain|+12.5|1004.3|97
+SYDNEY|-33.86,151.21,39|2017-09-23T00:02:12Z|RAINY|+12.5|1004.3|97
 
 ## Pre-requisites
 
