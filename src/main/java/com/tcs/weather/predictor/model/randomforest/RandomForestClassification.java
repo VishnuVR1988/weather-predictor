@@ -17,9 +17,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * Created by vishnuvr on 15/10/2017.
+ * This class is the implementation of RandomForest based classification algorithm
+ * @author Vishnu
+ * @since 1.0.0
+ * @version 1.0.0
  */
+
 public class RandomForestClassification implements ClassificationModel {
 
 
@@ -95,7 +98,7 @@ public class RandomForestClassification implements ClassificationModel {
      * @throws WeatherPredictionException
      */
     @Override
-    public Dataset <Row> pointForecast ( Dataset <Row> inputDataSet, Dataset <Row> predictionDataSet  )
+    public Dataset <Row> applyClassification ( Dataset <Row> inputDataSet, Dataset <Row> predictionDataSet  )
             throws WeatherPredictionException {
 
         //First, we create a “feature” column of all the predictor value

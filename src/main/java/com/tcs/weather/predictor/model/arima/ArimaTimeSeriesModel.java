@@ -8,6 +8,7 @@ import com.cloudera.sparkts.api.java.JavaTimeSeriesRDD;
 import com.cloudera.sparkts.api.java.JavaTimeSeriesRDDFactory;
 import com.cloudera.sparkts.UniformDateTimeIndex;
 
+import com.tcs.weather.predictor.constants.MLConstants;
 import org.apache.spark.mllib.linalg.Vectors;
 import org.apache.spark.mllib.linalg.Vector;
 import org.apache.spark.sql.*;
@@ -26,8 +27,12 @@ import com.tcs.weather.predictor.constants.Constants;
 
 
 /**
- * @author vishnu
+ * This class is the implementation of arima based forecast algorithm
+ * @author Vishnu
+ * @since 1.0.0
+ * @version 1.0.0
  */
+
 public class ArimaTimeSeriesModel implements TimeSeriesModel,Serializable {
 
 
@@ -90,7 +95,7 @@ public class ArimaTimeSeriesModel implements TimeSeriesModel,Serializable {
      * @param n elements to be retrieved
      * @return
      */
-    public static Vector getLast ( Vector v, int n ) {
+    private static Vector getLast ( Vector v, int n ) {
         double[] data = new double[n];
 
         for (int i = 0; i < n; ++i)
@@ -106,7 +111,7 @@ public class ArimaTimeSeriesModel implements TimeSeriesModel,Serializable {
      * @param v Input vector
      * @return
      */
-    public static Vector ewma ( Vector v ) {
+    private static Vector ewma ( Vector v ) {
         double[] data = new double[v.size()];
 
         data[0] = v.apply(0);
@@ -125,7 +130,7 @@ public class ArimaTimeSeriesModel implements TimeSeriesModel,Serializable {
      * @param v2 second vector
      * @return
      */
-    public static Vector diff ( Vector v1, Vector v2 ) {
+    private static Vector diff ( Vector v1, Vector v2 ) {
         double[] data = new double[v1.size()];
 
         for (int i = 0; i < v1.size(); ++i)
@@ -182,7 +187,7 @@ public class ArimaTimeSeriesModel implements TimeSeriesModel,Serializable {
         tsRDD.cache();
 
         // Impute missing values using linear interpolation
-        JavaTimeSeriesRDD <String> filledTsRDD = tsRDD.fill("linear").fill("next");
+        JavaTimeSeriesRDD <String> filledTsRDD = tsRDD.fill(MLConstants.LINEAR).fill(MLConstants.NEXT);
 
         //ARIMA forecast
         JavaTimeSeriesRDD <String> tsRDDForecast;
@@ -192,7 +197,7 @@ public class ArimaTimeSeriesModel implements TimeSeriesModel,Serializable {
                     Vector tsEwma = ewma(ts);
                     Vector tsEwmaDiff = diff(ts, tsEwma);
                     Vector tsDiff = getLast(ARIMA.fitModel(p, d, q,
-                            tsEwmaDiff, true, "css-cgd", null)
+                            tsEwmaDiff, true, MLConstants.CSS_CGD, null)
                                     .forecast(tsEwmaDiff, steps),
                             steps);
                     double[] data = new double[steps];

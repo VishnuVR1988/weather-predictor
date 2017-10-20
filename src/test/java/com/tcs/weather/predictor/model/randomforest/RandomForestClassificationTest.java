@@ -36,10 +36,10 @@ public class RandomForestClassificationTest {
 
     @Test
     public void testPointForecast () throws Exception {
-        Dataset <Row> rowDataset = SparkUtils.loadDataSet(spark, config.input);
+        Dataset <Row> rowDataset = SparkUtils.loadDataSet(spark, config.input.dataPath);
         Dataset[] splits = rowDataset.randomSplit(new double[] { 0.7, 0.3 });
         Dataset trainingData = splits[0];
         Dataset testData = splits[1];
-        assertNotNull(conditionModel.pointForecast(trainingData,testData));
+        assertNotNull(conditionModel.applyClassification(trainingData,testData));
     }
 }

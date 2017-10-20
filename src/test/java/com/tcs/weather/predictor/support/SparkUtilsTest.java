@@ -48,19 +48,19 @@ public class SparkUtilsTest {
 
     @Test
     public void testCreateSparkContextAppName () {
-        assertEquals("Toy Weather Predictor", config.spark.appName);
+        assertEquals("Test Toy Weather Predictor", config.spark.appName);
     }
 
 
     @Test
     public void testLoadDataSet () {
-        assertNotNull(SparkUtils.loadDataSet(spark, config.input));
+        assertNotNull(SparkUtils.loadDataSet(spark, config.input.dataPath));
     }
 
 
     @Test
     public void testLoadDataSetSchema () {
-        Dataset <Row> rowDataset = SparkUtils.loadDataSet(spark, config.input);
+        Dataset <Row> rowDataset = SparkUtils.loadDataSet(spark, config.input.dataPath);
         StructType expectedSchema = DataTypes.createStructType(Arrays.asList(
                 DataTypes.createStructField("station", DataTypes.StringType, true),
                 DataTypes.createStructField("date", DataTypes.TimestampType, true),
@@ -75,7 +75,7 @@ public class SparkUtilsTest {
 
     @Test
     public void testSaveDataSet () {
-        Dataset <Row> rowDataset = SparkUtils.loadDataSet(spark, config.input);
+        Dataset <Row> rowDataset = SparkUtils.loadDataSet(spark, config.input.dataPath);
         assertTrue(SparkUtils.saveDataSet(rowDataset.map((MapFunction <Row, String>) row
                 -> row.mkString(), Encoders.STRING()), config.output.path));
     }

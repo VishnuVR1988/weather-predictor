@@ -1,0 +1,13 @@
+station,date,temperature,humidity,pressure,condition
+Adelaide,2017-08-1,8.6,57.56,1023.9,SUNNY
+Adelaide,2017-08-2,7.2,62.4,1025.6,RAINY
+Adelaide,2017-08-3,8.9,85.6,1020.3,RAINY
+Adelaide,2017-08-4,10.3,60.6,1010,SUNNY
+Adelaide,2017-08-5,8.6,57.56,1023.9,SUNNY
+Adelaide,2017-08-6,7.2,62.4,1025.6,RAINY
+Adelaide,2017-08-7,8.9,85.6,1020.3,RAINY
+Adelaide,2017-08-8,10.3,60.6,1010,SUNNY
+Adelaide,2017-08-9,8.6,57.56,1023.9,SUNNY
+Adelaide,2017-08-10,7.2,62.4,1025.6,RAINY
+Adelaide,2017-08-11,8.9,85.6,1020.3,RAINY
+Adelaide,2017-08-12,10.3,60.6,1010,SUNNY

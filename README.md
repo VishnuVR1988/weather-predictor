@@ -10,7 +10,7 @@ this using machine learning algorithms and big data frameworks like spark.
 
 Create a toy model of the environment (taking into account things like atmosphere, topography, geography, oceanography, or similar) that evolves over time. Then take measurements at various locations (ie weather stations), and then have the program emit that data, as in the following:
 
-SYD|-33.86,151.21,39|2015-12-23T05:02:12Z|Rain|+12.5|1004.3|97
+SYDNEY|-33.86,151.21,39|2015-12-23T05:02:12Z|Rain|+12.5|1004.3|97
 
 ## Pre-requisites
 
@@ -27,7 +27,7 @@ sparkts(spark cloudera time series library)
 
 The model is built upon historic data to forecast temperature , humidity , pressure and weather condition.As the 
 weather observations are over a period of time, time-series 
-analysis using ARIMA is used to forecast weather parameters like temperature ,pressure and humidity. These have been modelled as Univariate variables
+analysis using ARIMA is used to forecast weather parameters like temperature ,pressure and humidity. These have been modelled as univariate variables.
 .
 
 
@@ -43,8 +43,6 @@ Once the temperature, pressure ,humidity are forecasted,
 the overall weather condition(SNOW/RAIN/SUNNY) is evaluated using a random forest classification 
 model.
 
-<TODO: Random forest>
-
 ARIMA methodology does have its limitations. These models directly rely on past values, and therefore work best on long and stable series.
 Also it is best suited for short term predictions.
 
@@ -55,28 +53,61 @@ The application is driven by a config file in the resources folder
 application.conf. It accepts the following parameters.
 
 
-spark.master -
+spark.master - Spark master URL.
+
+spark.appName - Spark application name.
+
+input.dataPath- Path to load the input.
+
+output.path- Path to save the output.
 
 
-spark.appName -
+The historical weather details are downloaded from Bureau of Meteorology, Australia website.
+ 
+The input for two stations Sydney and Melbourne (2 months data) are available under src/main/resources
+More number for stations can be added by providing historical values in the below format 
+under input directory.
 
-
-input.dataPath
-
-
-output.path-
-
-
+Format:
+```
+<station>,<date>,<temperature>,<pressure>,<humidity>,<condition>
+```
+Eg:
+```
+station,date,temperature,pressure,humidity,condition
+sydney,2017-09-01,13.7,1024.2,48,SUNNY
+```
+FileName: Should be station name
 
 ## Build
 
 This project is built using Apache Maven. To build this run:
 
-build/mvn -DskipTests clean package
+    mvn -DskipTests clean package
 
 ## Execution
 
+Once build is completed, jar is generated under target folder.
 
+This can be run using the script under bin folder.
+
+    ./bin/run_weather-predictor.sh
+    Usage: bin/run_weather-predictor.sh <numDays(OPTIONAL)>
 
 
 ## Files and Folders
+
+Input files
+
+![sydney][src/main/java/resources/input/sydney.csv]
+
+![melbourne][src/main/java/resources/input/melbourne.csv]
+
+![application.conf] [src/conf/application.conf]
+
+![run_weather-predictor.sh][bin/run_weather-predictor.sh]
+
+
+
+
+

@@ -1,4 +1,3 @@
-logs
 project/project
 project/target
 target
@@ -11,14 +10,11 @@ dist
 .target
 .idea
 .idea_modules
-bin
-conf
 doc
 lib
 src/wip
 target
-!src/test/java/com/tcs/weather/predictor/support/SparkUtilsTest.java
-!src/test/java/com/tcs/weather/predictor/support/GeoUtilsTest.java
+
 
 
 # OS generated files #

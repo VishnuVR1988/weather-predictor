@@ -17,6 +17,6 @@ public interface ClassificationModel {
      * @return
      * @throws WeatherPredictionException
      */
-    Dataset<Row> pointForecast ( Dataset <Row> trainDataSet, Dataset <Row> predictionDataSet ) throws WeatherPredictionException;
+    Dataset<Row> applyClassification ( Dataset <Row> trainDataSet, Dataset <Row> predictionDataSet ) throws WeatherPredictionException;
 
 }

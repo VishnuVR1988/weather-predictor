@@ -6,22 +6,19 @@ import com.tcs.weather.predictor.exception.WeatherPredictionException;
 import com.tcs.weather.predictor.model.arima.ArimaTimeSeriesModel;
 import com.tcs.weather.predictor.model.randomforest.RandomForestClassification;
 import com.tcs.weather.predictor.support.GeoUtils;
-import org.apache.spark.api.java.function.MapFunction;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.spark.sql.*;
-
-import static org.apache.spark.sql.functions.lit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.tcs.weather.predictor.model.TimeSeriesModel;
 import com.tcs.weather.predictor.ModelLoader;
-import com.tcs.weather.predictor.dto.WeatherDTO;
 import com.tcs.weather.predictor.constants.Constants;
 import com.tcs.weather.predictor.support.ServiceConfig;
 import com.tcs.weather.predictor.support.SparkUtils;
 
-import java.io.IOException;
+import java.util.List;
 
 
 /**
@@ -48,6 +45,8 @@ import java.io.IOException;
  * Once dataset is loaded it uses spark-timeseries library for predicting temperature, pressure and humidity.
  * See {@linktourl https://github.com/sryza/spark-timeseries}
  *
+ * @author Vishnu
+ *
  * @see ArimaTimeSeriesModel
  * </p>
  * <p>
@@ -56,10 +55,8 @@ import java.io.IOException;
  * Weather condition is classified according to predicted temperature, pressure and humidity values.
  * @see RandomForestClassification
  * </p>
- *
- * @author Vishnu
- * @version 1.0.0
  * @since 1.0.0
+ * @version 1.0.0
  */
 
 public class Main {
@@ -82,93 +79,71 @@ public class Main {
         }
     }
 
-    private static void run ( int limit ) throws WeatherPredictionException,IOException {
+
+    private static void run ( int limit ) throws WeatherPredictionException {
 
         logger.info("Parsing application.conf file.");
         //Load the application config file from resources
         final ServiceConfig config = ServiceConfig.getConfig();
-        logger.info("Instantiating spark session object");
+        logger.info("Instantiating spark session object.");
         //Instantiate the spark session object
-        final SparkSession spark = SparkUtils.createSparkContext(config.spark);
+        SparkSession sparkSession = SparkUtils.createSparkContext(config.spark);
+        //Get the input files. File names correspond to cities.
+        logger.info("Loading input file paths.");
+        List <String> inputFiles = SparkUtils.getInputFiles(sparkSession, config.input.dataPath);
+        //Create an initial empty dataset
+        logger.info("Creating empty dataset.");
+        Dataset <Row> initialDataSet = SparkUtils.createEmptyDataSet(sparkSession);
 
-        //Load the dataset
+        //Perform the prediction for each cities
+        for (String file : inputFiles) {
 
-        logger.info("Loading input dataset from the path {}", config.input.dataPath);
-        Dataset <Row> inputData = SparkUtils.loadDataSet(spark, config.input);
-        logger.info("Data loaded successfully from {}", config.input.dataPath);
+            logger.info("Loading input dataset from the file  {}", file);
+            Dataset <Row> inputData = SparkUtils.loadDataSet(sparkSession, file);
+            logger.info("Data loaded successfully from {}", file);
 
-        //Displays the schema of input dataset
-        inputData.printSchema();
+            //Create the model objects
+            logger.info("Loading  the model objects for predicting values.");
 
-        //root
-        //       |-- station: string (nullable = true)
-        //       |-- date: timestamp (nullable = true)
-        //       |-- temperature: double (nullable = true)
-        //       |-- humidity: double (nullable = true)
-        //       |-- pressure: double (nullable = true)
-        //       |-- condition: string (nullable = true)
+            TimeSeriesModel tempTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.TEMPERATURE);
+            TimeSeriesModel pressureTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.PRESSURE);
+            TimeSeriesModel humidityTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.HUMIDITY);
+            ClassificationModel conditionClassificationModel = ModelLoader.loadModel(new RandomForestClassification(), Constants.CONDITION);
 
-        // Displays the content of the DataFrame to stdout
-        inputData.show();
+            logger.info("TimeSeriesModel creation completed.Starting regression ....");
 
-        // --------+-------------------+-----------+--------+--------+---------+
-        // | station|               date|temperature|humidity|pressure|condition|
-        // +--------+-------------------+-----------+--------+--------+---------+
-        // |Adelaide|2017-08-01 00:00:00|        8.6|   57.56|  1023.9|    SUNNY|
-        // |Adelaide|2017-08-02 00:00:00|        7.2|    62.4|  1025.6|    RAINY|
-        // |Adelaide|2017-08-03 00:00:00|        8.9|    85.6|  1020.3|    RAINY|
-        // --------+-------------------+-----------+--------+--------+---------+
+            //Do the auto arima regression for temperature
+            Dataset <Row> tempForecast = tempTimeSeriesModel.pointForecast(inputData, sparkSession, limit);
 
-        //Create the model objects
-        logger.info("Loading  the model objects for predicting values.");
+            //Do the auto arima regression for pressure
+            Dataset <Row> pressureForecast = pressureTimeSeriesModel.pointForecast(inputData, sparkSession, limit);
 
-        TimeSeriesModel tempTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.TEMPERATURE);
-        TimeSeriesModel pressureTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.PRESSURE);
-        TimeSeriesModel humidityTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.HUMIDITY);
-        ClassificationModel conditionClassificationModel = ModelLoader.loadModel(new RandomForestClassification(), Constants.CONDITION);
+            //Do the auto arima regression for humidity
+            Dataset <Row> humidityForecast = humidityTimeSeriesModel.pointForecast(inputData, sparkSession, limit);
 
-        logger.info("TimeSeriesModel creation completed.Starting regression ....");
+            //Join the datasets based on date column
+            logger.info("Joining the datasets based on date column.");
+            Dataset <Row> joinedDS = tempForecast.join(pressureForecast.drop(Constants.STATION), Constants.DATE)
+                    .join(humidityForecast.drop(Constants.STATION), Constants.DATE);
 
-        //Do the auto arima regression for temperature
-        Dataset <Row> tempForecast = tempTimeSeriesModel.pointForecast(inputData, spark, limit);
+            //Perform classification for condition
+            Dataset <Row> predictedDSWithCondition = conditionClassificationModel.applyClassification(inputData, joinedDS);
 
-        //Do the auto arima regression for pressure
-        Dataset <Row> pressureForecast = pressureTimeSeriesModel.pointForecast(inputData, spark, limit);
+            //Enrich the datasets by adding location information and sort by date.
+            //This is loaded to WeatherDTO class.
 
-        //Do the auto arima regression for humidity
-        Dataset <Row> humidityForecast = humidityTimeSeriesModel.pointForecast(inputData, spark, limit);
+            Geocode geocode = GeoUtils.getLatLongAlt(FilenameUtils.getBaseName(file));
 
-        //Join the datasets based on date column
-        logger.info("Joining the datasets based on date column.");
-        Dataset <Row> joinedDS = tempForecast.join(pressureForecast.drop(Constants.STATION), Constants.DATE)
-                .join(humidityForecast.drop(Constants.STATION), Constants.DATE);
+            Dataset <Row> finalDS = SparkUtils.enrichWithGeoPoints(predictedDSWithCondition, geocode);
 
-        //Perform classification for condition
-        Dataset <Row> predictedDSWithCondition = conditionClassificationModel.pointForecast(inputData,joinedDS);
+            //Union to the initial dataset
+            initialDataSet = initialDataSet.unionAll(finalDS);
 
-        //Enrich the datasets by adding location information and sort by date.
-        //This is loaded to WeatherDTO class.
-
-        Geocode geocode = GeoUtils.getLatLongAlt("sydney");
-
-        logger.debug("latitude is "+geocode.getLatitude());
-        logger.debug("longitude is "+geocode.getLongitude());
-        logger.debug("altitude is "+geocode.getAltitude());
-
-
-        Dataset <WeatherDTO> finalDS = predictedDSWithCondition.
-                withColumn("latitude", lit(geocode.getLatitude()))
-                .withColumn("longitude", lit(geocode.getLongitude()))
-                .withColumn("altitude", lit(geocode.getAltitude())).orderBy("date")
-                .as(Encoders.bean(WeatherDTO.class));
-
-        //Preview of output is displayed.
-        finalDS.show();
+        }
 
         //convert to String dataset.
-        Dataset <String> finalDSStr = finalDS.map(
-                (MapFunction <WeatherDTO, String>) WeatherDTO::toString,
-                Encoders.STRING());
+        Dataset <String> finalDSStr = SparkUtils.convertToStringDataset(initialDataSet);
+        finalDSStr.show(false);
 
         //Save to output folder
         final boolean isSaved = SparkUtils.saveDataSet(finalDSStr, config.output.path);
@@ -176,8 +151,7 @@ public class Main {
         if (isSaved) {
             logger.info("Dataset output successfully written to folder {}", config.output.path);
         }
-
-        spark.stop();
+        sparkSession.stop();
 
     }
 

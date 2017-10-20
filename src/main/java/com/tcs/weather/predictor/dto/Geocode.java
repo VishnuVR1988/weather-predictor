@@ -1,8 +1,12 @@
 package com.tcs.weather.predictor.dto;
 
 /**
- * Created by vishnuvr on 14/10/2017.
+ * This class is a wrapper of geo co ordinate fields
+ * @author Vishnu
+ * @since 1.0.0
+ * @version 1.0.0
  */
+
 public class Geocode {
 
     private double latitude;

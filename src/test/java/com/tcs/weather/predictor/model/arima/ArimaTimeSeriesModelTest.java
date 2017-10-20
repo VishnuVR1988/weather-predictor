@@ -36,12 +36,12 @@ public class ArimaTimeSeriesModelTest {
 
     @Test
     public void testPointForecast () throws Exception {
-        assertNotNull(pressureModel.pointForecast(SparkUtils.loadDataSet(spark, config.input),spark,10));
+        assertNotNull(pressureModel.pointForecast(SparkUtils.loadDataSet(spark, config.input.dataPath),spark,10));
     }
 
     @Test
     public void testPointForecastStepSize () throws Exception {
-        assertEquals(10,pressureModel.pointForecast(SparkUtils.loadDataSet(spark, config.input),spark,10).count());
+        assertEquals(10,pressureModel.pointForecast(SparkUtils.loadDataSet(spark, config.input.dataPath ),spark,10).count());
     }
 
 

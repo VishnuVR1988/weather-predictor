@@ -64,12 +64,10 @@ public class ServiceConfig {
 
     public static class Output {
         public final String path;
-        public final boolean print;
 
 
         public Output ( com.typesafe.config.Config c ) {
             this.path = c.getString("path");
-            this.print = c.getBoolean("print");
         }
 
     }

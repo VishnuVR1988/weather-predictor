@@ -7,6 +7,7 @@ import com.google.code.geocoder.model.*;
 import com.tcs.weather.predictor.constants.Constants;
 import com.tcs.weather.predictor.dto.Geocode;
 
+import com.tcs.weather.predictor.exception.WeatherPredictionException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -24,6 +25,7 @@ import java.io.IOException;
 
 /**
  * This class consists collection of static methods for generating geo code
+ *
  * @author Vishnu
  * @version 1.0.0
  * @since 1.0.0
@@ -47,18 +49,22 @@ public class GeoUtils {
      *
      * @param stationName -
      * @return lat-long array
-     * @throws IOException
+     * @throws WeatherPredictionException
      */
-    public static double[] getLatLngForAddr ( final String stationName ) throws IOException {
+    public static double[] getLatLngForAddr ( final String stationName ) {
         if (stationName == null) return ArrayUtils.EMPTY_DOUBLE_ARRAY;
         logger.debug(" LatLng Address is {}", stationName);
         final Geocoder geocoder = new Geocoder();
         final GeocoderRequest geocoderRequest;
-        final GeocodeResponse geocoderResponse;
+        GeocodeResponse geocoderResponse = null;
         geocoderRequest = new GeocoderRequestBuilder()
                 .setAddress(stationName)
                 .setLanguage("en").getGeocoderRequest();
-        geocoderResponse = geocoder.geocode(geocoderRequest);
+        try {
+            geocoderResponse = geocoder.geocode(geocoderRequest);
+        } catch (IOException e) {
+            logger.error("Failed to get response from geocoder api.");
+        }
         if (geocoderResponse != null && geocoderResponse.getStatus() == GeocoderStatus.OK && !geocoderResponse.getResults().isEmpty()) {
             // Get the first result
             GeocoderResult geocoderResult =
@@ -78,27 +84,33 @@ public class GeoUtils {
     /**
      * @param addr - google elevation api full address
      * @return - altitude/elevation
-     * @throws IOException
      */
 
     protected static double getElevationForAddr ( final String addr ) {
         double elevation = Double.NaN;
-        if (addr == null) return elevation;
-        logger.debug("Address is {}", addr);
-        final JSONObject jsonObj = new JSONObject(sendGetRequest(addr));
-        final GoogleElevationStatus status = GoogleElevationStatus.valueOf(
-                jsonObj.optString("status"));
-        if (status != GoogleElevationStatus.OK) {
+        try {
+            if (addr == null) return elevation;
+            logger.debug("Address is {}", addr);
+            final JSONObject jsonObj = new JSONObject(sendGetRequest(addr));
+            final GoogleElevationStatus status = GoogleElevationStatus.valueOf(
+                    jsonObj.optString("status"));
+            if (status != GoogleElevationStatus.OK) {
+                logger.error(
+                        "Error retrieving elevation data. Status returned by Google = {}", status);
+                return elevation;
+            }
+            JSONArray results = jsonObj.getJSONArray("results");
+            for (int i = 0; i < results.length(); i++) {
+                JSONObject cur = results.getJSONObject(i);
+                elevation = cur.optDouble("elevation");
+            }
+        } catch (Exception e) {
             logger.error(
-                    "Error retrieving elevation data. Status returned by Google = {}", status);
-            return elevation;
-        }
-        JSONArray results = jsonObj.getJSONArray("results");
-        for (int i = 0; i < results.length(); i++) {
-            JSONObject cur = results.getJSONObject(i);
-            elevation = cur.optDouble("elevation");
+                    "Error retrieving elevation data.");
+
         }
         return elevation;
+
     }
 
     /**
@@ -141,19 +153,27 @@ public class GeoUtils {
      * @return Geocode
      */
 
-    public static Geocode getLatLongAlt ( final String stationName ) throws IOException {
+    public static Geocode getLatLongAlt ( final String stationName ) {
 
         double[] latLngForAddr = getLatLngForAddr(stationName);
         double altitude = Double.NaN;
+        double latitude = Double.NaN;
+        double longitude = Double.NaN;
 
         if (ArrayUtils.isNotEmpty(latLngForAddr)) {
             altitude = getElevationForAddr(buildElevationUrl(latLngForAddr[0], latLngForAddr[1]));
+            latitude = latLngForAddr[0];
+            longitude = latLngForAddr[1];
         }
+
+        logger.debug("latitude is {}", latitude);
+        logger.debug("longitude is {}", longitude);
+        logger.debug("altitude is {}", altitude);
 
         Geocode geocode = new Geocode();
         geocode.setAltitude(altitude);
-        geocode.setLatitude(latLngForAddr[0]);
-        geocode.setLongitude(latLngForAddr[1]);
+        geocode.setLatitude(latitude);
+        geocode.setLongitude(longitude);
         return geocode;
     }
 

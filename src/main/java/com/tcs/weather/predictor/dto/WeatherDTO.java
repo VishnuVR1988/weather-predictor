@@ -2,25 +2,26 @@ package com.tcs.weather.predictor.dto;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 
 import static java.lang.String.join;
 
 /**
+ * This class correspons to weather prediction output fields
  * @author Vishnu
+ * @since 1.0.0
+ * @version 1.0.0
  */
 
 public class WeatherDTO implements Serializable {
 
-
-    private String station;
-
-    private Timestamp date;
+    private double altitude;
 
     private String condition;
 
-    private double temperature;
-
-    private double pressure;
+    private Timestamp date;
 
     private double humidity;
 
@@ -28,86 +29,112 @@ public class WeatherDTO implements Serializable {
 
     private double longitude;
 
-    private double altitude;
+    private double pressure;
 
-    public String getStation() {
+    private String station;
+
+
+    private double temperature;
+
+    private final String dateTimeFormatPattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+
+
+
+    public String getStation () {
         return station;
     }
 
-    public void setStation(String station) {
+    public void setStation ( String station ) {
         this.station = station;
     }
 
-    public Timestamp getDate() {
+    public Timestamp getDate () {
         return date;
     }
 
-    public void setDate(Timestamp date) {
+    public void setDate ( Timestamp date ) {
         this.date = date;
     }
 
-    public String getCondition() {
+    public String getCondition () {
         return condition;
     }
 
-    public void setCondition(String condition) {
+    public void setCondition ( String condition ) {
         this.condition = condition;
     }
 
-    public double getTemperature() {
+    public double getTemperature () {
         return temperature;
     }
 
-    public void setTemperature(double temperature) {
+    public void setTemperature ( double temperature ) {
         this.temperature = temperature;
     }
 
-    public double getPressure() {
+    public double getPressure () {
         return pressure;
     }
 
-    public void setPressure(double pressure) {
+    public void setPressure ( double pressure ) {
         this.pressure = pressure;
     }
 
-    public double getHumidity() {
+    public double getHumidity () {
         return humidity;
     }
 
-    public void setHumidity(double humidity) {
+    public void setHumidity ( double humidity ) {
         this.humidity = humidity;
     }
 
-    public double getLatitude() {
+    public double getLatitude () {
         return latitude;
     }
 
-    public void setLatitude(double latitude) {
+    public void setLatitude ( double latitude ) {
         this.latitude = latitude;
     }
 
-    public double getLongitude() {
+    public double getLongitude () {
         return longitude;
     }
 
-    public void setLongitude(double longitude) {
+    public void setLongitude ( double longitude ) {
         this.longitude = longitude;
     }
 
-    public double getAltitude() {
+    public double getAltitude () {
         return altitude;
     }
 
-    public void setAltitude(double altitude) {
+    public void setAltitude ( double altitude ) {
         this.altitude = altitude;
     }
 
     @Override
-    public String toString() {
+    public String toString () {
 
-        return join("||", station, latitude + "," + longitude + "," + altitude, date.toString(), condition, Double.toString(temperature),
-                Double.toString(pressure), Double.toString(humidity));
+        return join("|", station, joinLatLngAlt(), formatDate(), condition, format(temperature),
+                format(pressure), format(humidity));
     }
+
+
+    private String format(double value){
+        return String.format("%.2f", value);
+    }
+
+    private String joinLatLngAlt(){
+        return String.format("%.2f,%.2f,%.2f",latitude,longitude,altitude);
+    }
+
+
+    private String formatDate(){
+        final DateFormat format = new SimpleDateFormat(dateTimeFormatPattern);
+        return format.format(date);
+
+    }
+
 
 
 

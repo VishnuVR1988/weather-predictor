@@ -1,14 +1,25 @@
 package com.tcs.weather.predictor.constants;
 
 /**
+ * This class contains constants for machine learning algorithms
+ *
  * @author Vishnu
+ * @version 1.0.0
+ * @since 1.0.0
  */
+
 public class MLConstants {
 
-    private MLConstants(){}
+    public static final String LINEAR = "linear";
+    public static final String NEXT = "next";
+
+    private MLConstants () {
+    }
 
 
     //ARIMA Constants
+    public static final String CSS_CGD = "css-cgd";
+
     public static final int P_HUMIDITY = 1;
     public static final int D_HUMIDITY = 0;
     public static final int Q_HUMIDITY = 2;
