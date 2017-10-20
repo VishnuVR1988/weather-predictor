@@ -1,5 +1,6 @@
 package com.tcs.weather.predictor.support;
 
+import com.tcs.weather.predictor.exception.WeatherPredictionException;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.apache.spark.api.java.function.MapFunction;
@@ -61,20 +62,13 @@ public class SparkUtilsTest {
     @Test
     public void testLoadDataSetSchema () {
         Dataset <Row> rowDataset = SparkUtils.loadDataSet(spark, config.input.dataPath);
-        StructType expectedSchema = DataTypes.createStructType(Arrays.asList(
-                DataTypes.createStructField("station", DataTypes.StringType, true),
-                DataTypes.createStructField("date", DataTypes.TimestampType, true),
-                DataTypes.createStructField("temperature", DataTypes.DoubleType, true)
-                , DataTypes.createStructField("humidity", DataTypes.DoubleType, true),
-                DataTypes.createStructField("pressure", DataTypes.DoubleType, true),
-                DataTypes.createStructField("condition", DataTypes.StringType, true)
-        ));
+        StructType expectedSchema = SparkUtils.getStructType();
         assertEquals("Schema is not matching", expectedSchema, rowDataset.schema());
     }
 
 
     @Test
-    public void testSaveDataSet () {
+    public void testSaveDataSet () throws WeatherPredictionException {
         Dataset <Row> rowDataset = SparkUtils.loadDataSet(spark, config.input.dataPath);
         assertTrue(SparkUtils.saveDataSet(rowDataset.map((MapFunction <Row, String>) row
                 -> row.mkString(), Encoders.STRING()), config.output.path));

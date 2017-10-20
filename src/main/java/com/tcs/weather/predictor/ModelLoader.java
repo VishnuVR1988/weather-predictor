@@ -6,6 +6,8 @@ import com.tcs.weather.predictor.model.TimeSeriesModel;
 import com.tcs.weather.predictor.model.arima.ArimaTimeSeriesModel;
 import com.tcs.weather.predictor.model.randomforest.RandomForestClassification;
 import com.tcs.weather.predictor.constants.MLConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -15,6 +17,9 @@ import com.tcs.weather.predictor.constants.MLConstants;
  */
 
 public class ModelLoader {
+
+    private static final Logger logger = LoggerFactory.getLogger(ModelLoader.class);
+
 
     /**
      *
@@ -48,6 +53,9 @@ public class ModelLoader {
                 arimaModel.setVariable(variable);
                 break;
             }
+            default:
+                logger.error("Invalid parameter");
+                break;
 
         }
         return arimaModel;
@@ -64,6 +72,10 @@ public class ModelLoader {
             case (Constants.CONDITION):
                 applyClassificationParams(randomForestModel, variable);
                 break;
+            default:
+                logger.error("Invalid parameter");
+                break;
+
         }
         return randomForestModel;
     }

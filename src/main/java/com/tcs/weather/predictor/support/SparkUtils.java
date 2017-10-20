@@ -5,6 +5,7 @@ import com.tcs.weather.predictor.constants.Constants;
 
 import com.tcs.weather.predictor.dto.Geocode;
 import com.tcs.weather.predictor.dto.WeatherDTO;
+import com.tcs.weather.predictor.exception.WeatherPredictionException;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
@@ -39,6 +40,7 @@ public class SparkUtils {
 
     /**
      * This method constructs the spark master from provided config
+     *
      * @param sparkconfig
      * @return
      */
@@ -54,27 +56,35 @@ public class SparkUtils {
 
     /**
      * This method retrieves the list of files under input directory
+     *
      * @param sparkSession
      * @param path
      * @return
+     * @throws WeatherPredictionException
      */
-    public static List <String> getInputFiles ( SparkSession sparkSession, String path ) {
-        JavaRDD <Tuple2 <String, String>> stationData = sparkSession.sparkContext().
-                wholeTextFiles(path, 1).toJavaRDD();
-        JavaRDD <String> filesRDD = stationData.map((Function <Tuple2 <String, String>, String>) tuple2 -> tuple2._1);
-        return filesRDD.collect();
+    public static List <String> getInputFiles ( SparkSession sparkSession, String path ) throws WeatherPredictionException {
+        try {
+            JavaRDD <Tuple2 <String, String>> stationData = sparkSession.sparkContext().
+                    wholeTextFiles(path, 1).toJavaRDD();
+            JavaRDD <String> filesRDD = stationData.map((Function <Tuple2 <String, String>, String>) tuple2 -> tuple2._1);
+            return filesRDD.collect();
+
+        } catch (Exception e) {
+            throw new WeatherPredictionException(e.getCause(), String.format("Failed to locate files under the path %s", path));
+        }
 
     }
 
 
     /**
-     *  This method returns a struct schema object
+     * This method returns a struct schema object
+     *
      * @return
      */
-    private static StructType getStructType () {
+    protected static StructType getStructType () {
         return DataTypes.createStructType(Arrays.asList(
-                DataTypes.createStructField(Constants.STATION, DataTypes.StringType, true),
-                DataTypes.createStructField(Constants.DATE, DataTypes.TimestampType, true),
+                DataTypes.createStructField(Constants.STATION, DataTypes.StringType, false),
+                DataTypes.createStructField(Constants.DATE, DataTypes.TimestampType, false),
                 DataTypes.createStructField(Constants.TEMPERATURE, DataTypes.DoubleType, true)
                 , DataTypes.createStructField(Constants.HUMIDITY, DataTypes.DoubleType, true),
                 DataTypes.createStructField(Constants.PRESSURE, DataTypes.DoubleType, true),
@@ -85,6 +95,7 @@ public class SparkUtils {
 
     /**
      * This mthod returns a dataset object from an input file path
+     *
      * @param spark
      * @param path
      * @return
@@ -103,35 +114,44 @@ public class SparkUtils {
 
     /**
      * This method saves the output dataset to a file
+     *
      * @param ds
      * @param filePath
      * @return
+     * @throws WeatherPredictionException
      */
 
-    public static boolean saveDataSet ( Dataset ds, String filePath ) {
-        ds.coalesce(1).write().mode(SaveMode.Overwrite).csv(filePath);
-               // .save(filePath);
+    public static boolean saveDataSet ( Dataset ds, String filePath ) throws WeatherPredictionException{
+        try {
+            ds.coalesce(1).write().mode(SaveMode.Overwrite).csv(filePath);
+            logger.info("Dataset output successfully written to folder {}", filePath);
+        }
+        catch (Exception e){
+            throw new WeatherPredictionException(String.format("Failed to save final datset under {}",filePath));
+        }
+
         return true;
     }
 
 
     /**
      * This method creates an empty dataset with pre defined schema
+     *
      * @param sparkSession
      * @return
      */
     public static Dataset <Row> createEmptyDataSet ( SparkSession sparkSession ) {
         // Generate the schema based on the string of schemas
         StructType schema = DataTypes.createStructType(Arrays.asList(
-                DataTypes.createStructField("station", DataTypes.StringType, true),
-                DataTypes.createStructField("date", DataTypes.TimestampType, true),
-                DataTypes.createStructField("temperature", DataTypes.DoubleType, true)
-                , DataTypes.createStructField("humidity", DataTypes.DoubleType, true),
-                DataTypes.createStructField("pressure", DataTypes.DoubleType, true),
-                DataTypes.createStructField("condition", DataTypes.StringType, true),
-                DataTypes.createStructField("latitude", DataTypes.DoubleType, true),
-                DataTypes.createStructField("longitude", DataTypes.DoubleType, true),
-                DataTypes.createStructField("altitude", DataTypes.DoubleType, true)));
+                DataTypes.createStructField(Constants.STATION, DataTypes.StringType, false),
+                DataTypes.createStructField(Constants.DATE, DataTypes.TimestampType, false),
+                DataTypes.createStructField(Constants.TEMPERATURE, DataTypes.DoubleType, true)
+                , DataTypes.createStructField(Constants.HUMIDITY, DataTypes.DoubleType, true),
+                DataTypes.createStructField(Constants.PRESSURE, DataTypes.DoubleType, true),
+                DataTypes.createStructField(Constants.CONDITION, DataTypes.StringType, true),
+                DataTypes.createStructField(Constants.LATITUDE, DataTypes.DoubleType, true),
+                DataTypes.createStructField(Constants.LONGITUDE, DataTypes.DoubleType, true),
+                DataTypes.createStructField(Constants.ALTITUDE, DataTypes.DoubleType, true)));
 
         List <Row> rows = new ArrayList <>();
         return sparkSession.createDataFrame(rows, schema);
@@ -140,6 +160,7 @@ public class SparkUtils {
 
     /**
      * Returns java spark context from spark session object
+     *
      * @param sparkSession
      * @return
      */
@@ -150,6 +171,7 @@ public class SparkUtils {
 
     /**
      * This method enriches the dataset with location
+     *
      * @param ds
      * @param geocode
      * @return
@@ -165,6 +187,7 @@ public class SparkUtils {
 
     /**
      * Coverts the row dataset to string dataset by parsing to WeatherDTO
+     *
      * @param ds
      * @return
      */

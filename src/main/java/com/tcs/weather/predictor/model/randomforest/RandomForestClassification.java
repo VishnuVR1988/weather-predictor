@@ -103,7 +103,6 @@ public class RandomForestClassification implements ClassificationModel {
 
         //First, we create a “feature” column of all the predictor value
         //The predictors are assumed as temperature, pressure and humidity.
-
         logger.info("Creating the feature column of all the predictor values.");
 
         //VectorAssembler constructs Vector from raw feature columns
@@ -126,9 +125,6 @@ public class RandomForestClassification implements ClassificationModel {
         Dataset <Row> indexedDf = stringIndexerModel.transform(transformedDS);
         logger.info("String indexer is applied on the training dataset.");
 
-        //Preview of final dataset
-        indexedDf.show();
-
         //Create the random forest classifier object
         RandomForestClassifier randomForestClassifier = new RandomForestClassifier()
                 .setImpurity(impurity)
@@ -146,14 +142,11 @@ public class RandomForestClassification implements ClassificationModel {
 
         logger.info("Classification is applied successfully.");
 
-        classificationDS.show();
-
         // Convert indexed labels back to original labels.
         IndexToString converter = new IndexToString()
                 .setInputCol(Constants.PREDICTION)
                 .setOutputCol(Constants.PREDICTED + variable).setLabels(stringIndexerModel.labels());
         Dataset <Row> converted = converter.transform(classificationDS);
-        converted.show();
 
         return converted.select(Constants.STATION,Constants.DATE,Constants.TEMPERATURE, Constants.PRESSURE,
                     Constants.HUMIDITY, Constants.PREDICTED + variable).

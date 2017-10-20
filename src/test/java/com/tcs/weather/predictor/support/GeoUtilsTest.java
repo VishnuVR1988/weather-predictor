@@ -19,11 +19,11 @@ import static org.junit.Assert.*;
 public class GeoUtilsTest {
 
 
-//    @Test
-//    public void testBuildElevationUrl () {
-//        assertEquals("Failed to return elevation url", "https://maps.googleapis.com/maps/api/elevation/json?locations=-33.8688197,151.2092955"
-//                , GeoUtils.buildElevationUrl(-33.8688197, 151.2092955));
-//    }
+    @Test
+    public void testBuildElevationUrl () {
+        assertEquals("Failed to return elevation url", "https://maps.googleapis.com/maps/api/elevation/json?locations=-33.8688197,151.2092955"
+                , GeoUtils.buildElevationUrl(-33.8688197, 151.2092955));
+    }
 
     @Test
     public void testGetLatLngForAddr () throws IOException {

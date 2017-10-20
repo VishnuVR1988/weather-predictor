@@ -46,7 +46,7 @@ import java.util.List;
  * See {@linktourl https://github.com/sryza/spark-timeseries}
  *
  * @author Vishnu
- *
+ * @version 1.0.0
  * @see ArimaTimeSeriesModel
  * </p>
  * <p>
@@ -56,7 +56,6 @@ import java.util.List;
  * @see RandomForestClassification
  * </p>
  * @since 1.0.0
- * @version 1.0.0
  */
 
 public class Main {
@@ -110,8 +109,6 @@ public class Main {
             TimeSeriesModel humidityTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.HUMIDITY);
             ClassificationModel conditionClassificationModel = ModelLoader.loadModel(new RandomForestClassification(), Constants.CONDITION);
 
-            logger.info("TimeSeriesModel creation completed.Starting regression ....");
-
             //Do the auto arima regression for temperature
             Dataset <Row> tempForecast = tempTimeSeriesModel.pointForecast(inputData, sparkSession, limit);
 
@@ -127,6 +124,7 @@ public class Main {
                     .join(humidityForecast.drop(Constants.STATION), Constants.DATE);
 
             //Perform classification for condition
+            logger.info("TimeSeriesModel prediction completed.Starting regression ....");
             Dataset <Row> predictedDSWithCondition = conditionClassificationModel.applyClassification(inputData, joinedDS);
 
             //Enrich the datasets by adding location information and sort by date.
@@ -146,11 +144,8 @@ public class Main {
         finalDSStr.show(false);
 
         //Save to output folder
-        final boolean isSaved = SparkUtils.saveDataSet(finalDSStr, config.output.path);
+        SparkUtils.saveDataSet(finalDSStr, config.output.path);
 
-        if (isSaved) {
-            logger.info("Dataset output successfully written to folder {}", config.output.path);
-        }
         sparkSession.stop();
 
     }

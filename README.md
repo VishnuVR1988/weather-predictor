@@ -3,7 +3,7 @@
 ## Introduction
 
 Weather forecast systems are among the most complex equations that computer has to solve. Bigdata has the potential to
-transform the way we can understand and predict weather systems using distributed computing capabilities. This project aims to solve
+transform the way we can understand and predict w   eather systems using distributed computing capabilities. This project aims to solve
 this using machine learning algorithms and big data frameworks like spark.
 
 ## Problem Statement
@@ -68,7 +68,7 @@ The input for two stations Sydney and Melbourne (2 months data) are available un
 More number for stations can be added by providing historical values in the below format 
 under input directory.
 
-Format:
+Input Format:
 ```
 <station>,<date>,<temperature>,<pressure>,<humidity>,<condition>
 ```
@@ -99,13 +99,13 @@ This can be run using the script under bin folder.
 
 Input files
 
-![sydney][src/main/java/resources/input/sydney.csv]
+![sydney][https://github.com/VishnuVR1988/weather-predictor/tree/master/src/main/java/resources/input/sydney.csv]
 
-![melbourne][src/main/java/resources/input/melbourne.csv]
+![melbourne][https://github.com/VishnuVR1988/weather-predictor/tree/master/src/main/java/resources/input/melbourne.csv]
 
-![application.conf] [src/conf/application.conf]
+![application.conf] [https://github.com/VishnuVR1988/weather-predictor/tree/master/src/conf/application.conf]
 
-![run_weather-predictor.sh][bin/run_weather-predictor.sh]
+![run_weather-predictor.sh][https://github.com/VishnuVR1988/weather-predictor/tree/master/bin/run_weather-predictor.sh]
 
 
 
