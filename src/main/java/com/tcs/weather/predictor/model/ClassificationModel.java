@@ -1,6 +1,5 @@
 package com.tcs.weather.predictor.model;
 
-import com.tcs.weather.predictor.exception.WeatherPredictionException;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
@@ -12,11 +11,11 @@ public interface ClassificationModel {
 
     /**
      *
-     * @param trainDataSet
-     * @param predictionDataSet
-     * @return
-     * @throws WeatherPredictionException
+     * @param trainDataSet - Input training data
+     * @param predictionDataSet - Actula data on which prediction to be applied.
+     * @return predicted datset with classfication applied
      */
-    Dataset<Row> applyClassification ( Dataset <Row> trainDataSet, Dataset <Row> predictionDataSet ) throws WeatherPredictionException;
+
+    Dataset<Row> applyClassification ( Dataset <Row> trainDataSet, Dataset <Row> predictionDataSet );
 
 }

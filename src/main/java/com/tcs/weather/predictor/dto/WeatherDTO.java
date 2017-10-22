@@ -1,10 +1,11 @@
 package com.tcs.weather.predictor.dto;
 
+import com.tcs.weather.predictor.constants.Constants;
+
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 
 import static java.lang.String.join;
 
@@ -35,9 +36,6 @@ public class WeatherDTO implements Serializable {
 
 
     private double temperature;
-
-    private final String dateTimeFormatPattern = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-
 
 
     public String getStation () {
@@ -130,6 +128,7 @@ public class WeatherDTO implements Serializable {
 
 
     private String formatDate(){
+        String dateTimeFormatPattern = Constants.OUT_DATE_FORMAT;
         final DateFormat format = new SimpleDateFormat(dateTimeFormatPattern);
         return format.format(date);
 

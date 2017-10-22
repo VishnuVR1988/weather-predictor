@@ -1,20 +1,15 @@
 package com.tcs.weather.predictor.support;
 
 import com.tcs.weather.predictor.exception.WeatherPredictionException;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Arrays;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
@@ -22,8 +17,13 @@ import static org.junit.Assert.*;
 
 
 /**
- * Created by vishnuvr on 18/10/2017.
+ * This class consists of test methods for SparkUtils Class
+ *
+ * @author Vishnu
+ * @version 1.0.0
+ * @since 1.0.0
  */
+
 public class SparkUtilsTest {
 
     private transient SparkSession spark;
@@ -70,8 +70,7 @@ public class SparkUtilsTest {
     @Test
     public void testSaveDataSet () throws WeatherPredictionException {
         Dataset <Row> rowDataset = SparkUtils.loadDataSet(spark, config.input.dataPath);
-        assertTrue(SparkUtils.saveDataSet(rowDataset.map((MapFunction <Row, String>) row
-                -> row.mkString(), Encoders.STRING()), config.output.path));
+        assertTrue(SparkUtils.saveDataSet(rowDataset.map((MapFunction <Row, String>) Row::mkString, Encoders.STRING()), config.output.path));
     }
 
     @After

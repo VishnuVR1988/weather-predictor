@@ -1,11 +1,10 @@
 package com.tcs.weather;
 
-import com.tcs.weather.predictor.dto.Geocode;
+import com.tcs.weather.predictor.ModelExecutor;
 import com.tcs.weather.predictor.model.ClassificationModel;
 import com.tcs.weather.predictor.exception.WeatherPredictionException;
 import com.tcs.weather.predictor.model.arima.ArimaTimeSeriesModel;
 import com.tcs.weather.predictor.model.randomforest.RandomForestClassification;
-import com.tcs.weather.predictor.support.GeoUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.spark.sql.*;
 
@@ -94,50 +93,23 @@ public class Main {
         logger.info("Creating empty dataset.");
         Dataset <Row> initialDataSet = SparkUtils.createEmptyDataSet(sparkSession);
 
+        //Intializing model classes
+        TimeSeriesModel tempTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.TEMPERATURE);
+        TimeSeriesModel pressureTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.PRESSURE);
+        TimeSeriesModel humidityTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.HUMIDITY);
+        ClassificationModel conditionClassificationModel = ModelLoader.loadModel(new RandomForestClassification(), Constants.CONDITION);
+
+
         //Perform the prediction for each cities
         for (String file : inputFiles) {
-
             logger.info("Loading input dataset from the file  {}", file);
             Dataset <Row> inputData = SparkUtils.loadDataSet(sparkSession, file);
             logger.info("Data loaded successfully from {}", file);
-
-            //Create the model objects
-            logger.info("Loading  the model objects for predicting values.");
-
             String station = FilenameUtils.getBaseName(file);
-
-            TimeSeriesModel tempTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.TEMPERATURE, station);
-            TimeSeriesModel pressureTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.PRESSURE, station);
-            TimeSeriesModel humidityTimeSeriesModel = ModelLoader.loadModel(new ArimaTimeSeriesModel(), Constants.HUMIDITY, station);
-            ClassificationModel conditionClassificationModel = ModelLoader.loadModel(new RandomForestClassification(), Constants.CONDITION, station);
-
-            //Do the auto arima regression for temperature
-            Dataset <Row> tempForecast = tempTimeSeriesModel.pointForecast(inputData, sparkSession, limit);
-
-            //Do the auto arima regression for pressure
-            Dataset <Row> pressureForecast = pressureTimeSeriesModel.pointForecast(inputData, sparkSession, limit);
-
-            //Do the auto arima regression for humidity
-            Dataset <Row> humidityForecast = humidityTimeSeriesModel.pointForecast(inputData, sparkSession, limit);
-
-            //Join the datasets based on date column
-            logger.info("Joining the datasets based on date column.");
-            Dataset <Row> joinedDS = tempForecast.join(pressureForecast.drop(Constants.STATION), Constants.DATE)
-                    .join(humidityForecast.drop(Constants.STATION), Constants.DATE);
-
-            //Perform classification for condition
-            logger.info("TimeSeriesModel prediction completed.Starting regression ....");
-            Dataset <Row> predictedDSWithCondition = conditionClassificationModel.applyClassification(inputData, joinedDS);
-
-            //Enrich the datasets by adding location information and sort by date.
-            //This is loaded to WeatherDTO class.
-
-            Geocode geocode = GeoUtils.getLatLongAlt(station);
-
-            Dataset <Row> finalDS = SparkUtils.enrichWithGeoPoints(predictedDSWithCondition, geocode);
-
+            Dataset <Row> finalDS = ModelExecutor.getRowDataset(limit, sparkSession, tempTimeSeriesModel,
+                    pressureTimeSeriesModel, humidityTimeSeriesModel, conditionClassificationModel, inputData, station);
             //Union to the initial dataset
-            initialDataSet = initialDataSet.unionAll(finalDS);
+            if (finalDS != null) initialDataSet = initialDataSet.union(finalDS);
 
         }
 

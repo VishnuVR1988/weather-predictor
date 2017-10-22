@@ -10,10 +10,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-
 /**
- * Created by vishnuvr on 18/10/2017.
+ * This class consists of test methods for Arima TimeSeries Model Class
+ *
+ * @author Vishnu
+ * @version 1.0.0
+ * @since 1.0.0
  */
+
 public class ArimaTimeSeriesModelTest {
 
     private transient SparkSession spark;

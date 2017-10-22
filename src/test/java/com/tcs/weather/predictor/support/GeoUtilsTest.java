@@ -64,7 +64,6 @@ public class GeoUtilsTest {
         geocode.setAltitude(24.5399284362793);
         geocode.setLatitude(-33.8688197);
         geocode.setLongitude(151.2092955);
-        System.out.println(geocode.equals(geocode));
         assertEquals("Failed to return geocode",geocode,GeoUtils.getLatLongAlt("sydney"));
     }
 }

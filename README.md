@@ -101,13 +101,13 @@ This can be overrided accordingly.
 
 ## Files and Folders
 
-#####Input files
+ ###Input files
 
   - [sydney.csv](https://github.com/VishnuVR1988/weather-predictor/tree/master/src/main/java/resources/input/sydney.csv)
  
   - [melbourne.csv](https://github.com/VishnuVR1988/weather-predictor/tree/master/src/main/java/resources/input/melbourne.csv)
 
-#####Other files
+ ###Other files
 
   - [application.conf](https://github.com/VishnuVR1988/weather-predictor/tree/master/src/conf/application.conf)
 

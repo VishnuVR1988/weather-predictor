@@ -11,7 +11,6 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
-import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructType;
 
@@ -127,7 +126,7 @@ public class SparkUtils {
             logger.info("Dataset output successfully written to folder {}", filePath);
         }
         catch (Exception e){
-            throw new WeatherPredictionException(String.format("Failed to save final datset under {}",filePath));
+            throw new WeatherPredictionException(String.format("Failed to save final dataset under %s",filePath));
         }
 
         return true;

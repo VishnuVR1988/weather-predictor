@@ -13,8 +13,13 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * Created by vishnuvr on 18/10/2017.
+ * This class consists of test methods for Random Forest Model Class
+ *
+ * @author Vishnu
+ * @version 1.0.0
+ * @since 1.0.0
  */
+
 public class RandomForestClassificationTest {
 
     private transient SparkSession spark;
@@ -38,8 +43,8 @@ public class RandomForestClassificationTest {
     public void testPointForecast () throws Exception {
         Dataset <Row> rowDataset = SparkUtils.loadDataSet(spark, config.input.dataPath);
         Dataset[] splits = rowDataset.randomSplit(new double[] { 0.7, 0.3 });
-        Dataset trainingData = splits[0];
-        Dataset testData = splits[1];
+        Dataset<Row> trainingData = splits[0];
+        Dataset<Row> testData = splits[1];
         assertNotNull(conditionModel.applyClassification(trainingData,testData));
     }
 }

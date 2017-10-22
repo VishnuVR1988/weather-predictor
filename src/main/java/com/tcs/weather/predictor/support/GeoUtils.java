@@ -86,23 +86,26 @@ public class GeoUtils {
      * @return - altitude/elevation
      */
 
-    protected static double getElevationForAddr ( final String addr ) {
+    static double getElevationForAddr ( final String addr ) {
         double elevation = Double.NaN;
         try {
             if (addr == null) return elevation;
             logger.debug("Address is {}", addr);
-            final JSONObject jsonObj = new JSONObject(sendGetRequest(addr));
-            final GoogleElevationStatus status = GoogleElevationStatus.valueOf(
-                    jsonObj.optString("status"));
-            if (status != GoogleElevationStatus.OK) {
-                logger.error(
-                        "Error retrieving elevation data. Status returned by Google = {}", status);
-                return elevation;
-            }
-            JSONArray results = jsonObj.getJSONArray("results");
-            for (int i = 0; i < results.length(); i++) {
-                JSONObject cur = results.getJSONObject(i);
-                elevation = cur.optDouble("elevation");
+            final String elevationApiResponse = sendGetRequest(addr);
+            if (elevationApiResponse != null) {
+                final JSONObject jsonObj = new JSONObject(elevationApiResponse);
+                final GoogleElevationStatus status = GoogleElevationStatus.valueOf(
+                        jsonObj.optString("status"));
+                if (status != GoogleElevationStatus.OK) {
+                    logger.error(
+                            "Error retrieving elevation data. Status returned by Google = {}", status);
+                    return elevation;
+                }
+                JSONArray results = jsonObj.getJSONArray("results");
+                for (int i = 0; i < results.length(); i++) {
+                    JSONObject cur = results.getJSONObject(i);
+                    elevation = cur.optDouble("elevation");
+                }
             }
         } catch (Exception e) {
             logger.error(
@@ -113,6 +116,7 @@ public class GeoUtils {
 
     }
 
+
     /**
      * This method builds the elevation api url
      *
@@ -121,7 +125,7 @@ public class GeoUtils {
      * @return google elevation api url
      */
 
-    protected static String buildElevationUrl ( final double latitude, final double longitude ) {
+    static String buildElevationUrl ( final double latitude, final double longitude ) {
         return String.format(Constants.GEO_ELEVATION_URL, latitude, longitude);
     }
 
@@ -132,8 +136,9 @@ public class GeoUtils {
      * @param url
      * @return
      */
-    protected static String sendGetRequest ( final String url ) {
-        try (CloseableHttpClient httpClient = HttpClients.createDefault();) {
+    static String sendGetRequest ( final String url ) {
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet request = new HttpGet(url);
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 return EntityUtils.toString(response.getEntity(), "UTF-8");
@@ -144,7 +149,6 @@ public class GeoUtils {
         }
         return null;
     }
-
 
     /**
      * This method returns the geocode of a location by hitting google api

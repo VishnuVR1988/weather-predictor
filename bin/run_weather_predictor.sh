@@ -30,7 +30,7 @@ fi
 
 get_abs_script_path
 
-echo "SCRIPT_DIR is "$SCRIPT_DIR
+echo "SCRIPT_DIR is "${SCRIPT_DIR}
 
 MS_UBER_BIN_JAR=${SCRIPT_DIR}/../target/uber.jar
 
@@ -60,7 +60,7 @@ cmd='spark-submit --class $MAIN
   --conf "spark.executor.extraJavaOptions=LOG4J_FILE"
   --driver-java-options "$MS_PARAMS" $MS_UBER_BIN_JAR $PARAMS'
 
-eval $cmd $PARAMS
+eval ${cmd} ${PARAMS}
 
 exit 0
 

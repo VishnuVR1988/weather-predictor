@@ -13,10 +13,6 @@ dist
 doc
 lib
 src/wip
-target
-
-
-
 # OS generated files #
 ######################
 .DS_Store

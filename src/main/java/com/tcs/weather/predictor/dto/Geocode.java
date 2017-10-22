@@ -47,9 +47,7 @@ public class Geocode {
 
         Geocode geocode = (Geocode) o;
 
-        if (Double.compare(geocode.latitude, latitude) != 0) return false;
-        if (Double.compare(geocode.longitude, longitude) != 0) return false;
-        return Double.compare(geocode.altitude, altitude) == 0;
+        return Double.compare(geocode.latitude, latitude) == 0 && Double.compare(geocode.longitude, longitude) == 0 && Double.compare(geocode.altitude, altitude) == 0;
     }
 
     @Override
