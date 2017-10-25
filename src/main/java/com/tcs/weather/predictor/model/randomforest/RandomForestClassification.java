@@ -108,7 +108,7 @@ public class RandomForestClassification implements ClassificationModel {
 
     @Override
     public Dataset <Row> applyClassification ( Dataset <Row> inputDataSet, Dataset <Row> predictionDataSet ) {
-        //First, we create a “feature” column of all the predictor value
+        //First, we create a feature column of all the predictor value
         //The predictors are assumed as temperature, pressure and humidity.
         logger.info("Creating the feature column of all the predictor values.");
 
