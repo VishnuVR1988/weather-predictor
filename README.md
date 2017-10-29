@@ -96,7 +96,9 @@ This can be run using the script under bin folder.
     Usage: bin/run_weather-predictor.sh <numDays(OPTIONAL)>
 
 The application.conf and log4.properties are available under conf folder.
-This can be overrided accordingly.
+This can be overrided accordingly.Relative path is provided in
+default config. Please change path if running from a different
+directory other than weather-predictor.
 
 
 ## Files and Folders

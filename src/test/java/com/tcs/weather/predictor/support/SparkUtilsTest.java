@@ -59,13 +59,6 @@ public class SparkUtilsTest {
     }
 
 
-    @Test
-    public void testLoadDataSetSchema () {
-        Dataset <Row> rowDataset = SparkUtils.loadDataSet(spark, config.input.dataPath);
-        StructType expectedSchema = SparkUtils.getStructType();
-        assertEquals("Schema is not matching", expectedSchema, rowDataset.schema());
-    }
-
 
     @Test
     public void testSaveDataSet () throws WeatherPredictionException {

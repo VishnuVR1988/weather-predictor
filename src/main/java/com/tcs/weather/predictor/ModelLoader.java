@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author Vishnu
  * @version 1.0.0
  * @since 1.0.0
@@ -25,7 +24,7 @@ public class ModelLoader {
      *
      * @param arimaModel
      * @param variable
-     * @return
+     * @return the timeseries model object
      */
     public static TimeSeriesModel loadModel ( ArimaTimeSeriesModel arimaModel, String variable) {
 
@@ -65,7 +64,7 @@ public class ModelLoader {
      *
      * @param randomForestModel
      * @param variable
-     * @return
+     * @return the classification model object
      */
     public static ClassificationModel loadModel ( RandomForestClassification randomForestModel, String variable) {
         switch (variable) {

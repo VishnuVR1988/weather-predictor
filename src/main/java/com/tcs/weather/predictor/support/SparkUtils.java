@@ -41,7 +41,7 @@ public class SparkUtils {
      * This method constructs the spark master from provided config
      *
      * @param sparkconfig
-     * @return
+     * @return the spark session object
      */
 
     public static SparkSession createSparkContext ( ServiceConfig.Spark sparkconfig ) {
@@ -58,7 +58,7 @@ public class SparkUtils {
      *
      * @param sparkSession
      * @param path
-     * @return
+     * @return the list of input files
      * @throws WeatherPredictionException
      */
     public static List <String> getInputFiles ( SparkSession sparkSession, String path ) throws WeatherPredictionException {
@@ -78,7 +78,7 @@ public class SparkUtils {
     /**
      * This method returns a struct schema object
      *
-     * @return
+     * @return the struct type schema for dataset
      */
     protected static StructType getStructType () {
         return DataTypes.createStructType(Arrays.asList(
@@ -97,7 +97,7 @@ public class SparkUtils {
      *
      * @param spark
      * @param path
-     * @return
+     * @return the dataset from input path
      */
     public static Dataset <Row> loadDataSet ( SparkSession spark, String path ) {
 
@@ -116,7 +116,7 @@ public class SparkUtils {
      *
      * @param ds
      * @param filePath
-     * @return
+     * @return true if saved successfully
      * @throws WeatherPredictionException
      */
 
@@ -137,7 +137,7 @@ public class SparkUtils {
      * This method creates an empty dataset with pre defined schema
      *
      * @param sparkSession
-     * @return
+     * @return an empty dataset
      */
     public static Dataset <Row> createEmptyDataSet ( SparkSession sparkSession ) {
         // Generate the schema based on the string of schemas
@@ -161,7 +161,7 @@ public class SparkUtils {
      * Returns java spark context from spark session object
      *
      * @param sparkSession
-     * @return
+     * @return a Spark Context object
      */
     public static JavaSparkContext getJavaSparkContext ( SparkSession sparkSession ) {
         return JavaSparkContext.fromSparkContext(sparkSession.sparkContext());
@@ -173,7 +173,7 @@ public class SparkUtils {
      *
      * @param ds
      * @param geocode
-     * @return
+     * @return Dataset with geo points as extra columns
      */
     public static Dataset <Row> enrichWithGeoPoints ( Dataset <Row> ds, Geocode geocode ) {
         return ds.
@@ -187,8 +187,8 @@ public class SparkUtils {
     /**
      * Coverts the row dataset to string dataset by parsing to WeatherDTO
      *
-     * @param ds
-     * @return
+     * @param ds - Input dataset
+     * @return the string dataset
      */
     public static Dataset <String> convertToStringDataset ( Dataset <Row> ds ) {
         return ds.as(Encoders.bean(WeatherDTO.class)).orderBy(Constants.DATE)

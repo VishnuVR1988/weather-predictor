@@ -10,6 +10,7 @@ public class Constants {
 
 
     public static final String OUT_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    public static final int DEFAULT_LIMIT = 10;
 
     private Constants(){}
 

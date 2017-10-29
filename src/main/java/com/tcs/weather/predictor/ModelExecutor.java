@@ -21,10 +21,22 @@ public class ModelExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(ModelExecutor.class);
 
-    public static Dataset <Row> getRowDataset ( int limit, SparkSession sparkSession, TimeSeriesModel tempTimeSeriesModel,
-                                                TimeSeriesModel pressureTimeSeriesModel, TimeSeriesModel humidityTimeSeriesModel,
-                                                ClassificationModel conditionClassificationModel, Dataset <Row> inputData,
-                                                String station ) {
+    /**
+     * Accepts the model objects and returns the predicted dataset object.
+     * @param limit
+     * @param sparkSession
+     * @param tempTimeSeriesModel
+     * @param pressureTimeSeriesModel
+     * @param humidityTimeSeriesModel
+     * @param conditionClassificationModel
+     * @param inputData
+     * @param station
+     * @return the predicted dataset object.
+     */
+    public static Dataset <Row> getPredictedDataset ( int limit, SparkSession sparkSession, TimeSeriesModel tempTimeSeriesModel,
+                                                      TimeSeriesModel pressureTimeSeriesModel, TimeSeriesModel humidityTimeSeriesModel,
+                                                      ClassificationModel conditionClassificationModel, Dataset <Row> inputData,
+                                                      String station ) {
         try {
             //Do the auto arima regression for temperature
             Dataset <Row> tempForecast = tempTimeSeriesModel.pointForecast(inputData, sparkSession, limit);

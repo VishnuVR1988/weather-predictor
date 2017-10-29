@@ -2,7 +2,8 @@
 ################################################################################
 # Script to launch weather predictor jar and generate the prediction values.
 
-# application.conf can be placed inside conf folder to override default values
+# application.conf can be placed inside conf folder to override default values. Relative path is provided in
+# default config. Please change path if running from a different directory other than weather-predictor
 #log4.properties override the default logging
 
 ################################################################################

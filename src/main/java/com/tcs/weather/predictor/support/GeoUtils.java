@@ -48,7 +48,7 @@ public class GeoUtils {
      * Extracts the latitude and longitude using google map services api
      *
      * @param stationName -
-     * @return lat-long array
+     * @return array of latitude and longitude
      * @throws WeatherPredictionException
      */
     public static double[] getLatLngForAddr ( final String stationName ) {
@@ -83,7 +83,7 @@ public class GeoUtils {
 
     /**
      * @param addr - google elevation api full address
-     * @return - altitude/elevation
+     * @return  the altitude/elevation
      */
 
     static double getElevationForAddr ( final String addr ) {
@@ -122,7 +122,7 @@ public class GeoUtils {
      *
      * @param latitude
      * @param longitude
-     * @return google elevation api url
+     * @return the google elevation api url
      */
 
     static String buildElevationUrl ( final double latitude, final double longitude ) {
@@ -134,7 +134,7 @@ public class GeoUtils {
      * A method to send HTTP Webservice GET request
      *
      * @param url
-     * @return
+     * @return response from http service
      */
     static String sendGetRequest ( final String url ) {
 

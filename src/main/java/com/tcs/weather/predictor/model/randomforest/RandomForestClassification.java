@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class is the implementation of RandomForest based classification algorithm
+ * This class is the implementation of Random Forest based classification algorithm
  *
  * @author Vishnu
  * @version 1.0.0
@@ -27,7 +27,6 @@ public class RandomForestClassification implements ClassificationModel {
 
 
     private static final Logger logger = LoggerFactory.getLogger(RandomForestClassification.class);
-
 
     private String impurity;
 
@@ -101,9 +100,10 @@ public class RandomForestClassification implements ClassificationModel {
 
 
     /**
+     * The method performs the classification on predictionDataSet based on trainDataSet
      * @param inputDataSet
      * @param predictionDataSet
-     * @return
+     * @return the predicted dataset with classification applied
      */
 
     @Override

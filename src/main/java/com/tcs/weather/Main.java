@@ -32,7 +32,7 @@ import java.util.List;
  * <p>
  * <p>
  * The predictor is driven by <b>application.conf</b> placed under the resources. This can be overriden by placing
- * same file under the conf folder and run using weather-predictor.sh.
+ * same file under the conf folder and run using run_weather_predictor.sh.
  * <p>
  * The application loads the properties from the above file and accepts the number of future forecast steps
  * as a command line argument.
@@ -43,9 +43,6 @@ import java.util.List;
  * <p>
  * Once dataset is loaded it uses spark-timeseries library for predicting temperature, pressure and humidity.
  * See {@linktourl https://github.com/sryza/spark-timeseries}
- *
- * @author Vishnu
- * @version 1.0.0
  * @see ArimaTimeSeriesModel
  * </p>
  * <p>
@@ -54,6 +51,8 @@ import java.util.List;
  * Weather condition is classified according to predicted temperature, pressure and humidity values.
  * @see RandomForestClassification
  * </p>
+ * @author Vishnu
+ * @version 1.0.0
  * @since 1.0.0
  */
 
@@ -65,7 +64,7 @@ public class Main {
 
         boolean status = true;
         logger.info("Starting weather predictor main program execution.");
-        int limit = args.length > 1 ? Integer.parseInt(args[0]) : 10;
+        int limit = args.length > 1 ? Integer.parseInt(args[0]) : Constants.DEFAULT_LIMIT;
         logger.info("Setting limit for forecast size as :{}", limit);
         try {
             run(limit);
@@ -77,6 +76,12 @@ public class Main {
         }
     }
 
+
+    /**
+     * Executes the prediction for given limit
+     * @param limit
+     * @throws WeatherPredictionException
+     */
 
     private static void run ( int limit ) throws WeatherPredictionException {
 
@@ -106,7 +111,7 @@ public class Main {
             Dataset <Row> inputData = SparkUtils.loadDataSet(sparkSession, file);
             logger.info("Data loaded successfully from {}", file);
             String station = FilenameUtils.getBaseName(file);
-            Dataset <Row> finalDS = ModelExecutor.getRowDataset(limit, sparkSession, tempTimeSeriesModel,
+            Dataset <Row> finalDS = ModelExecutor.getPredictedDataset(limit, sparkSession, tempTimeSeriesModel,
                     pressureTimeSeriesModel, humidityTimeSeriesModel, conditionClassificationModel, inputData, station);
             //Union to the initial dataset
             if (finalDS != null) initialDataSet = initialDataSet.union(finalDS);
